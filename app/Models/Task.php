@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,4 +19,16 @@ class Task extends Model
     protected $casts = [
         'is_done' => "boolean"
     ];
+
+    public function creator()
+    {
+        $this->belongsTo(User::class, 'creator_id');
+    }
+
+    public static function booted()
+    {
+        static::addGlobalScope('creator', function (Builder $builder) {
+            $builder->where('creator_id', Auth::id());
+        });
+    }
 }

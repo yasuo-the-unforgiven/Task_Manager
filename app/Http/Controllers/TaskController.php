@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use Auth;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -16,6 +17,8 @@ class TaskController extends Controller
     {
         $tasks = QueryBuilder::for(Task::class)
             ->allowedFilters('is_done')
+            ->defaultSorts('-created_at')
+            ->allowedSorts(['title', 'is_done', 'created_at'])
             ->paginate();
         return new TaskCollection($tasks);
     }
@@ -29,7 +32,7 @@ class TaskController extends Controller
     {
         $validated = $request->validated();
 
-        $task = Task::create($validated);
+        $task = Auth::user()->tasks()->create($validated);
 
         return new TaskResource($task);
     }
